@@ -1,0 +1,43 @@
+# Ignore build artifacts from the local tests sub-crate.
+/target/
+
+# Ignore backup files creates by cargo fmt.
+**/*.rs.bk
+
+# Remove Cargo.lock when creating an executable, leave it for libraries
+# More information here http://doc.crates.io/guide.html#cargotoml-vs-cargolock
+Cargo.lock
+
+/node_modules
+
+# ENV variables and secrets
+.env
+
+# IDE specific files
+.vscode
+
+# Log files
+*.log
+*.receipt.json
+
+# Test files
+coverage/
+coverage.json
+gas_report
+gcp.json
+.eslintcache
+
+# Alternative package.json files for publishing
+# Will be removed in the future
+package.json_
+
+*.tgz
+
+# TypeScript build files
+*.tsbuildinfo
+
+# Other
+.DS_Store
+
+docker/scripts/dist
+secrets.env
