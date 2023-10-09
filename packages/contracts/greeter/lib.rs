@@ -2,19 +2,14 @@
 
 #[ink::contract]
 mod tipper {
-    use ink::LangError;
+    
     // use ink::primitives::AccountId;
     use ink::{
         codegen::EmitEvent,
-        prelude::{format, string::String, vec::Vec},
+        prelude::{string::String, vec::Vec},
         storage::Mapping,
-        ToAccountId,
     };
     use ink::{
-        env::{
-            call::{build_call, ExecutionInput, FromAccountId, Selector},
-            DefaultEnvironment, Error as InkEnvError,
-        },
         reflect::ContractEventBase,
     };
     // use tracing::Event;
@@ -39,6 +34,7 @@ mod tipper {
         total_supply: Balance,
         balances: Mapping<AccountId, Balance>,
         elements_count: u32,
+        pizza_tippers: Vec<AccountId>,
         //oracle -> pizza cost goodness
         price_per_pizza: u128,
         pizza_oracle: Option<AccountId>,
@@ -59,9 +55,9 @@ mod tipper {
     impl Tipper {
         #[ink(constructor)]
         pub fn new(
-            version: u8,
-            pizza_oracle_hash: Hash,
-            highlighted_pizzas_hash: Hash,
+            _version: u8,
+            _pizza_oracle_hash: Hash,
+            _highlighted_pizzas_hash: Hash,
             total_supply: Balance,
             price_per_pizza: u128,
         ) -> Self {
@@ -74,11 +70,12 @@ mod tipper {
             Self {
                 id_counter: 0,
                 elements_count: 0,
-                price_per_pizza: price_per_pizza,
+                price_per_pizza,
                 tip_map: Mapping::default(),
                 id_map: Mapping::default(),
                 pizza_oracle: None,
                 highlighted_pizzas: None,
+                pizza_tippers: Vec::new(),
                 total_supply,
                 balances,
             }
@@ -94,6 +91,7 @@ mod tipper {
                 elements_count: 0,
                 tip_map: Mapping::default(),
                 id_map: Mapping::default(),
+                pizza_tippers: Vec::new(),
                 pizza_oracle: None,
                 highlighted_pizzas: None,
             }
@@ -109,7 +107,12 @@ mod tipper {
             self.balances.get(owner).unwrap_or_default()
         }
 
-        pub fn lookup_pzzas(&self) -> Result<(), Error> {
+        #[ink(message)]
+        pub fn get_pizza_tippers(&self) -> Vec<AccountId> {
+            self.pizza_tippers.clone()
+        }
+
+        pub fn lookup_pizzas(&self) -> Result<(), Error> {
             Ok(())
         }
 
@@ -141,7 +144,7 @@ mod tipper {
                 n_pizzas,
                 tip_message
             );
-            if self.id_map.contains(&from) {
+            if self.id_map.contains(from) {
                 return Err(Error::AlreadyTipped);
             }
             let transfered_amount = self.env().transferred_value();
@@ -173,14 +176,23 @@ mod tipper {
             let tip_id = self.insert_tip(&from, tip);
 
             PizzaSent {
-                from: from,
-                to: to,
+                from,
+                to,
                 id: tip_id,
             }
         }
 
-        fn insert_tip(&mut self, caller: &AccountId, tip: Tip) -> u32 {
-            unimplemented!()
+        fn insert_tip(&mut self, from: &AccountId, tip: Tip) -> u32 {
+            let pizza_id = self.id_counter;
+            self.id_map.insert(from, &pizza_id);
+            self.tip_map.insert(pizza_id, &tip);
+            self.id_counter = pizza_id + 1;
+            self.pizza_tippers.push(*from);
+            pizza_id
+        }
+
+        fn get_by_id(&self, id: u32) -> Option<Tip> {
+            self.tip_map.get(id)
         }
 
         fn emit_event<EE>(emitter: EE, event: Event)
@@ -233,19 +245,38 @@ mod tipper {
         }
 
         #[ink::test]
-        fn total_supply_works() {
-            let tipper = Tipper::new(100, 25);
-            assert_eq!(tipper.total_supply(), 100);
+        fn constructor_works() {
+            let tipper = Tipper::free();
+            assert_eq!(tipper.price_per_pizza, 0);
         }
 
+        #[ink::test]
+        fn pizza_msg_test() {
+            let accts = get_test_accts();
+            let alice = accts.alice;
+            let mut tipper = Tipper::free();
+            let msg: ink::prelude::string::String = "dummy".into();
+            set_from(alice);
+            let executed_tip = tipper.tip(msg.clone(), accts.bob, 1);
+            let expected_tip = Tip {
+                from: alice,
+                pizzas: 1,
+                message: "dummy".into(),
+            };
+            assert_eq!(tipper.get_by_id(0).unwrap().message, expected_tip.message);
+        }
+
+        #[ink::test]
         fn event_on_tip() {
             let mut instance = Tipper::free();
+            unimplemented!()
         }
 
         #[ink::test]
         fn tipper_works() {
-            let mut tipper = Tipper::new(100, 25);
+            let mut tipper = Tipper::free();
             let accounts = ink::env::test::default_accounts::<ink::env::DefaultEnvironment>();
+            unimplemented!()
         }
         #[ink::test]
         fn pizza_oracle_works() {
