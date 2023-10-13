@@ -1,11 +1,10 @@
 {
-  "name": "@inkathon/monorepo",
+  "name": "@tipper/monorepo",
   "description": "Full-Stack DApp Boilerplate for Substrate-based networks and ink! Smart Contracts",
   "version": "0.0.1",
-  "homepage": "https://inkathon.xyz",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/scio-labs/inkathon"
+    "url": "git+https://github.com/nuts-rice"
   },
   "bugs": {
     "url": "https://github.com/scio-labs/inkathon/issues"

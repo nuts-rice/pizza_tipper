@@ -24,12 +24,12 @@ function MyApp({ Component, pageProps }: AppProps) {
         dangerouslySetAllPagesToNoIndex={!env.isProduction}
         defaultTitle="ink!athon" // TODO
         titleTemplate="%s | ink!athon" // TODO
-        description="Substrate-based Smart Contract & DApp Development Boilerplate" // TODO
+        description="pizza tipping app! " // TODO
         openGraph={{
           type: 'website',
           locale: 'en',
           url: env.url,
-          site_name: 'ink!athon', // TODO
+          site_name: 'tipper', // TODO
           images: [
             {
               url: `${env.url}/images/cover.jpg`, // TODO
@@ -39,7 +39,7 @@ function MyApp({ Component, pageProps }: AppProps) {
           ],
         }}
         twitter={{
-          handle: '@scio_xyz', // TODO
+          handle: '@nuts_rice', // TODO
         }}
       />
 

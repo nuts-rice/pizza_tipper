@@ -1,7 +1,6 @@
 {
-  "name": "@inkathon/contracts",
-  "version": "0.0.1",
-  "homepage": "https://inkathon.xyz",
+  "name": "@tipper/contracts",
+  "version": "0.0.1", 
   "type": "module",
   "scripts": {
     "test": "./test-all.sh",

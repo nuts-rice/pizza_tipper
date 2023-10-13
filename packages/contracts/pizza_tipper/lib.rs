@@ -7,7 +7,7 @@ mod tipper {
     use ink::{
         codegen::EmitEvent,
         prelude::{string::String, vec::Vec},
-        storage::Mapping,
+        storage::Mapping, 
     };
     use ink::{
         reflect::ContractEventBase,
@@ -21,6 +21,7 @@ mod tipper {
     )]
     pub struct Tip {
         from: AccountId,
+        to: AccountId,
         pizzas: u32,
         message: String,
     }
@@ -170,6 +171,7 @@ mod tipper {
         ) -> PizzaSent {
             let tip = Tip {
                 from,
+                to,
                 pizzas: n_pizzas,
                 message: tip_message,
             };
@@ -178,6 +180,7 @@ mod tipper {
             PizzaSent {
                 from,
                 to,
+                pizzas: n_pizzas,
                 id: tip_id,
             }
         }
@@ -209,6 +212,7 @@ mod tipper {
         from: AccountId,
         to: AccountId,
         id: u32,
+        pizzas: u32,
     }
 
     #[ink(event)]
@@ -244,6 +248,25 @@ mod tipper {
             ink::env::test::set_caller::<ink::env::DefaultEnvironment>(from);
         }
 
+        fn tip_from_alice(instance: &mut Tipper) -> Tip {
+            let accts = get_test_accts();
+            let alice = accts.alice;
+            let bob = accts.bob;
+            let msg : ink::prelude::string::String = "dummy".into();
+            let expected_tip = Tip {
+                from: alice,
+                to: bob,
+                pizzas: 1,
+                message: msg.clone()
+            };
+            set_from(alice);
+            assert!(instance.tip(msg, bob, 1).is_ok(),
+            "tipping expected");
+            expected_tip
+        }
+
+        const PRICE_PER_PIZZA: u128 = 7;
+
         #[ink::test]
         fn constructor_works() {
             let tipper = Tipper::free();
@@ -254,12 +277,14 @@ mod tipper {
         fn pizza_msg_test() {
             let accts = get_test_accts();
             let alice = accts.alice;
+            let bob = accts.bob;
             let mut tipper = Tipper::free();
             let msg: ink::prelude::string::String = "dummy".into();
             set_from(alice);
             let executed_tip = tipper.tip(msg.clone(), accts.bob, 1);
-            let expected_tip = Tip {
+            let expected_tip = Tip {                
                 from: alice,
+                to: bob,
                 pizzas: 1,
                 message: "dummy".into(),
             };
@@ -269,7 +294,9 @@ mod tipper {
         #[ink::test]
         fn event_on_tip() {
             let mut instance = Tipper::free();
-            unimplemented!()
+            let tip = tip_from_alice(&mut instance) ;
+            let recorded_events = recorded_events().collect::<Vec<_>>();
+            assert_expected_tip_event(&recorded_events[0], tip.to, tip.from, 0, tip.pizzas);
         }
 
         #[ink::test]
@@ -278,17 +305,21 @@ mod tipper {
             let accounts = ink::env::test::default_accounts::<ink::env::DefaultEnvironment>();
             unimplemented!()
         }
-        fn assert_expected_tip_event(event: &EmittedEvent, expected_from: AccountId, expected_id: u32) {
+        fn assert_expected_tip_event(event: &EmittedEvent, expected_to: AccountId, expected_from: AccountId, expected_id: u32, expected_pizzas: u32) {
             let decoded_event = <Event as Decode>::decode(&mut &event.data[..])
                 .expect("invalid contract eventy data buffer");
-            if let Event::TipPosted(TipPosted {
+            if let Event::PizzaSent(PizzaSent {                
                 from,
+                to,
                 id,
+                pizzas,
             }) = decoded_event {
                 assert_eq!(from, expected_from);
+                assert_eq!(to, expected_to);
                 assert_eq!(id, expected_id);
+                assert_eq!(pizzas, expected_pizzas);
             } else {
-                panic!("expected TipPosted")
+                panic!("expected PizzaSent")
             };
         }
 
