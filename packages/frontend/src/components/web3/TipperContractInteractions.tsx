@@ -56,7 +56,7 @@ export const TipperContractInteractions: FC = () => {
   const { api, activeAccount, activeSigner } = useInkathon()
   //FIX CONTRACT IDS
   const { contract, address: contractAddress } = useRegisteredContract(ContractIds.Tipper)
-  const [TipMessage, setTipMessage] = useState<string>()
+  const [tipMessage, setTipMessage] = useState<string>()
   const [tipTo, setTipTo] = useState<string>()
   const [tipPizzas, setTipPizzas] = useState<string>()
   const [fetchIsLoading, setFetchIsLoading] = useState<boolean>()
@@ -90,9 +90,40 @@ export const TipperContractInteractions: FC = () => {
     <h2 tw="text-center font-mono text-gray-400">Tipper Smart Contract</h2>
     <Card variant ="outline" p={4} bgColor="whiteAlpha.100">
     <FormControl>
-    <FormLabel></FormLabel>
+    <FormLabel> Tip </FormLabel>
+    <Input
+    // {/* TODO: load tip params */}
+    placeholder={fetchIsLoading || !contract ? 'Loading': tipMessage }
+    disabled={true}
+    />
     </FormControl>
     </Card>
+    <Card variant="outline" p={4} bgColor="whiteAlpha.100">
+    <form onSubmit={handleSubmit(updateTip)}>
+    <Stack direction="row" spacing={2} align="end">
+    <FormControl>
+    <FormLabel> Update tip message</FormLabel>
+    <Input disabled={updateIsLoading} {...register('newTipMessage')}/>
+    <FormLabel> Update tip destination</FormLabel>
+    <Input disabled={updateIsLoading} {...register('newTipTo')}/>
+    <FormLabel> Update amount of pizzas</FormLabel>
+    <Input disabled={updateIsLoading} {...register('newTipPizzas')}/>
+  </FormControl>
+  <Button
+    type="submit"
+    mt={4}
+    colorScheme="purple"
+    isLoading={updateIsLoading}
+    disabled={updateIsLoading}
+    >
+    Submit
+    </Button>
+    </Stack>
+    </form>
+    </Card>
+    <p tw="text-center font-mono text-xs text-gray-600"> 
+    {contract ? contractAddress: 'Loading...'}
+    </p>
     </div>
     </>
     )

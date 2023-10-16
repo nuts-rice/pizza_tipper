@@ -12,7 +12,7 @@ import { useForm } from 'react-hook-form'
 import toast from 'react-hot-toast'
 import 'twin.macro'
 
-type UpdateGreetingValues = { newMessage: string }
+type UpdateGreetingValues = { newMessage?: string }
 
 export const GreeterContractInteractions: FC = () => {
   const { api, activeAccount, activeSigner } = useInkathon()

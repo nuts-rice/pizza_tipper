@@ -6,7 +6,7 @@ mod tipper {
     use ink::{
         codegen::EmitEvent,
         prelude::{string::String, vec::Vec},
-        storage::Mapping, env::{call::{build_call, ExecutionInput, FromAccountId, Selector}, DefaultEnvironment, }, LangError, primitives::AccountId  
+        storage::Mapping  
     };
     use ink::{
         reflect::ContractEventBase,
@@ -24,8 +24,6 @@ mod tipper {
         to: AccountId,
         pizzas: u32,
         message: String,
-        //Payment channel: amount withdrawn by 'to' 
-        
     }
 
     #[ink(storage)]
@@ -46,7 +44,7 @@ mod tipper {
 
     #[derive(Debug, PartialEq, Eq, scale::Encode, scale::Decode)]
     #[cfg_attr(feature = "std", derive(scale_info::TypeInfo))]
-    pub enum TipperError {
+    pub enum Error {
         InsufficientBalance,
         PizzaCostTooLow(u128),
         AlreadyTipped,
@@ -109,7 +107,7 @@ mod tipper {
             self.pizza_tippers.clone()
         }
 
-        pub fn lookup_pizzas(&self) -> Result<(), TipperError> {
+        pub fn lookup_pizzas(&self) -> Result<(), Error> {
             Ok(())
         }
 
@@ -120,7 +118,7 @@ mod tipper {
             tip_message: String,
             to: AccountId,
             n_pizzas: u32,
-        ) -> Result<(), TipperError> {
+        ) -> Result<(), Error> {
             let from = Self::env().caller();
             ink::env::debug_println!(
                 "{:?} wants to tip {:?} with {:?} pizzas with the message '{:?}' ",
@@ -139,9 +137,9 @@ mod tipper {
                 .unwrap_or(u128::MAX);
 
             if transfered_amount < pizza_cost {
-                return Err(TipperError::PizzaCostTooLow(pizza_cost));
+                return Err(Error::PizzaCostTooLow(pizza_cost));
             }
-            let event = self._tip(tip_message, from, to, n_pizzas );
+            let event = self._tip(tip_message, from, to, n_pizzas);
             Self::emit_event(Self::env(), Event::PizzaSent(event));
             Ok(())
         }
@@ -152,7 +150,6 @@ mod tipper {
             from: AccountId,
             to: AccountId,
             n_pizzas: u32,
-          
         ) -> PizzaSent {
             let tip = Tip {
                 from,
@@ -178,11 +175,6 @@ mod tipper {
             self.pizza_tippers.push(*from);
             pizza_id
         }
-        fn reimburse(&self, to: AccountId, amount: u128) {
-            if Self::env().transfer(to, amount).is_err() {
-                panic!("failed to reimburse caller")
-            }
-        }
         fn get_by_account(&self, from: &AccountId) -> Option<Tip> {
             if let Some(tip_id) = self.id_map.get(from) {
                 let tip = self.tip_map.get(tip_id).unwrap_or_else(|| {
@@ -196,45 +188,6 @@ mod tipper {
         }
         fn get_by_id(&self, id: u32) -> Option<Tip> {
             self.tip_map.get(id)
-        }
-        #[ink(message)]
-        pub fn terminate_contract(&mut self) {
-            if self.elements_count == 0 {
-                self.env().terminate_contract(self.env().caller());
-            }
-        }
-        fn highlight_tip(&self, from: AccountId, id: u32, cost: u128) -> Result<(), TipperError > {
-            if let Some(highlight_pizzas) = self.highlighted_pizzas {
-                let call_result : Result<Result<(), HighlightedPizzasError>, ink::LangError>  = build_call::<DefaultEnvironment>()
-                    .call(highlight_pizzas)
-                    .exec_input(ExecutionInput::new(Selector::new(HIGHLIGHT_PIZZA_SELECTOR
-                                                                  ))
-                                .push_arg(from)
-                                .push_arg(id),
-                                )
-                    .transferred_value(cost)
-                    .returns::<Result<Result<(), HighlightedPizzasError>, LangError>> ()
-                    .invoke();
-                match call_result {
-                    Err(lang_error) => {
-                        panic!("Unexpected ink::LangError: {:?}", lang_error)
-                    }
-                    Ok(Err(contract_call_error)) =>  {
-                        return Err(TipperError::HighlightError(contract_call_error,))
-                    }
-                    Ok(Ok(_unit)) => return Ok(()),
-
-                }
-            }
-            Ok(())
-
-        }
-        
-        fn delete_highlight(&self, from: AccountId) -> Result<(), TipperError> {
-
-            if let Some(highlight_tip) = self.highlighted_pizzas {
-                <HighlightedPizzasRef as FromAccountId<super::tipper::Environment, >>::from_account_id(highlight_tip).(from)?
-            }
         }
 
         fn emit_event<EE>(emitter: EE, event: Event)

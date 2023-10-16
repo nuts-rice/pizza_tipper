@@ -1,8 +1,6 @@
 [workspace]
 workspace.resolver = "2"
 members = [    
-    "greeter",
-    "tipper",
     "pizza_tipper",
     "highlighted_pizzas",
 ]

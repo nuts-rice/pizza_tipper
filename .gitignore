@@ -12,7 +12,7 @@ Cargo.lock
 
 # ENV variables and secrets
 .env
-
+.local-history
 # IDE specific files
 .vscode
 

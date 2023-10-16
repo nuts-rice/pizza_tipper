@@ -1,25 +1,27 @@
 #![cfg_attr(not(feature = "std"), no_std, no_main)]
 
+pub use highlighted_pizzas::{HighlightedPizzasError, HighlightedPizzasRef, DELETE_PIZZA_SELECTOR, GET_BY_AUTHOR_SELECTOR, HIGHLIGHTED_PIZZA_SELECTOR, HIGHLIGHTED_CONTENT_SELECTOR, HIGHLIGHT_PIZZA_SELECTOR, HIGHLIGHT_CONTENT_SELECTOR};
+
 #[ink::contract]
 mod highlighted_pizzas {
-    use ink::{codegen::EmitEvent, prelude::vec::Vec, storage::Mapping, };
+    use ink::{codegen::EmitEvent, prelude::vec::Vec, storage::Mapping,  };
     pub const HIGHLIGHTED_PIZZA_SELECTOR: [u8; 4] = [0, 0, 0, 6];
     pub const HIGHLIGHT_PIZZA_SELECTOR: [u8; 4] = [0, 0, 0, 7];
     pub const HIGHLIGHTED_CONTENT_SELECTOR: [u8; 4] = [0, 0, 0, 8];
-    pub const DELETE_HIGHLIGHT_SELECTOR: [u8; 4] = [0, 0, 0, 4];
+    pub const DELETE_PIZZA_SELECTOR: [u8; 4] = [0, 0, 0, 4];
+    pub const DELETE_CONTENT_SELECTOR : [u8; 4] = [0, 0, 0, 3];
     pub const HIGHLIGHT_CONTENT_SELECTOR: [u8; 4] = [0, 0, 0, 9];
     pub const GET_BY_AUTHOR_SELECTOR: [u8; 4] = [0, 0, 0, 5];
     type Event = <HighlightedPizzas as ink::reflect::ContractEventBase>::Type;
 
      #[ink(event)]
-    pub struct PostHighlighted {
+    pub struct ContentHighlighted {
         author: AccountId,
         id: u32,
     }
      #[ink(event)]
     pub struct HighlightRemoved {
         author: AccountId,
-        id: u32,
     }
 
     #[ink(event)]
@@ -41,19 +43,19 @@ mod highlighted_pizzas {
     #[ink(storage)]
     pub struct HighlightedPizzas {
         created_by: AccountId,
-        highlighted: Mapping<AccountId, u32>,
+        highlighted_pizzas: Mapping<AccountId, u32>,
+        highlighted_content: Mapping<AccountId, u32>,
         highlighted_ids: Vec<AccountId>,
         pizzas: Mapping<AccountId, u32>,
     }
 
 
-
     impl HighlightedPizzas {
         /// Constructor that initializes the `bool` value to the given `init_value`.
         #[ink(constructor)]
-        pub fn new(init_value: bool) -> Self {
+        pub fn new() -> Self {
             let caller = Self::env().caller(); 
-            Self { created_by: caller, highlighted: Mapping::default(), highlighted_ids: Vec::new(), pizzas: Mapping::default() }
+            Self { created_by: caller, highlighted_pizzas: Mapping::default(), highlighted_content: Mapping::default(), highlighted_ids: Vec::new(), pizzas: Mapping::default() }
         }
 
         #[ink(message, payable, selector = 7)]
@@ -61,17 +63,36 @@ mod highlighted_pizzas {
             if Self::env().caller() != self.created_by {
                 return Err(HighlightedPizzasError::AccessDenied);
             }
-            if self.highlighted.contains(from) {
+            if self.highlighted_pizzas.contains(from) {
                 return Result::Err(HighlightedPizzasError::AlreadyHighlighted);
             } else {
-                self.highlighted.insert(from, &id);
+                self.highlighted_pizzas.insert(from, &id);
                 self.highlighted_ids.push(from);
                 Self::emit_event(Self::env(), Event::PizzaHighlighted(PizzaHighlighted {from, to, id, pizzas}),
                 );
                 Ok(())
             }
 
+
         }
+        #[ink(message, payable, selector = 9)]
+        pub fn add_content(&mut self, author: AccountId, id: u32) -> Result<(), HighlightedPizzasError> {
+            if Self::env().caller() != self.created_by {
+                return Err(HighlightedPizzasError::AccessDenied);
+
+            } if self.highlighted_content.contains(author) {
+                return Result::Err(HighlightedPizzasError::AlreadyHighlighted);
+            } else {
+                self.highlighted_content.insert(author, &id);
+                self.highlighted_ids.push(author);
+                Self::emit_event(Self::env(), Event::ContentHighlighted(ContentHighlighted { author, id}),
+                );
+                Ok(())
+
+            }
+        }
+
+
 
         fn emit_event<EE>(emmiter: EE, event: Event)
             where
@@ -82,14 +103,54 @@ mod highlighted_pizzas {
 
 
         #[ink(message, selector = 6)]
-        pub fn highlighted_pizzas(&self) -> Vec<AccountId> {
-            self.highlighted_ids.clone()
+        pub fn get_highlighted_pizzas(&self, from: AccountId) -> Option<u32> {
+            self.highlighted_pizzas.get(from)
+        }
+        #[ink(message, selector = 8)]
+        pub fn get_content_by_author(&self, author: AccountId) -> Option<u32> {
+            self.highlighted_content.get(author)
+        }
+        #[ink(message, selector = 4)]
+        pub fn delete_tip_by_author(&mut self, from: AccountId) -> Result<(), HighlightedPizzasError> {
+            if Self::env().caller() != self.created_by {
+                return Err(HighlightedPizzasError::AccessDenied)
+            }
+            if !self.highlighted_pizzas.contains(from) {
+                return Err(HighlightedPizzasError::HighlightNotFound);
+             } else {
+                 self.highlighted_pizzas.remove(from);
+                 self.highlighted_ids.retain(|tip_from| tip_from != &from);
+                 Self::emit_event(Self::env(),
+                 Event::HighlightRemoved(HighlightRemoved {author: from}),
+                 );
+                 Ok(())
+             }
+        }
+        #[ink(message, selector = 3)]
+        pub fn delete_content_by_author(&mut self, author: AccountId) -> Result<(), HighlightedPizzasError> {
+            if Self::env().caller() != self.created_by {
+                return Err(HighlightedPizzasError::AccessDenied)
+            }
+            if !self.highlighted_content.contains(author) {
+                return Err(HighlightedPizzasError::HighlightNotFound);
+            } else {
+                 self.highlighted_content.remove(author);
+                 self.highlighted_ids.retain(|content_from| content_from != &author);
+                 Self::emit_event(Self::env(),
+                 Event::HighlightRemoved(HighlightRemoved {author}),
+                 );
+                 Ok(())
+
+            }
         }
 
-        #[ink(message)]
-        pub fn created_by(&self) -> AccountId {
-            self.created_by
-        }
+
+
+        // #[ink(message)]
+        // pub fn created_by(&self) -> AccountId {
+        //     self.created_by
+        // }
+
 
     }
 
