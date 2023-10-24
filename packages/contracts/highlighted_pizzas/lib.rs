@@ -1,6 +1,6 @@
 #![cfg_attr(not(feature = "std"), no_std, no_main)]
 
-pub use highlighted_pizzas::{HighlightedPizzasError, HighlightedPizzasRef, DELETE_PIZZA_SELECTOR, GET_BY_AUTHOR_SELECTOR, HIGHLIGHTED_PIZZA_SELECTOR, HIGHLIGHTED_CONTENT_SELECTOR, HIGHLIGHT_PIZZA_SELECTOR, HIGHLIGHT_CONTENT_SELECTOR};
+pub use self::highlighted_pizzas::{HighlightedPizzasError, HighlightedPizzasRef, DELETE_PIZZA_SELECTOR, GET_BY_AUTHOR_SELECTOR, HIGHLIGHTED_PIZZA_SELECTOR, HIGHLIGHTED_CONTENT_SELECTOR, HIGHLIGHT_PIZZA_SELECTOR, HIGHLIGHT_CONTENT_SELECTOR};
 
 #[ink::contract]
 mod highlighted_pizzas {

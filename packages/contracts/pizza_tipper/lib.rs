@@ -6,7 +6,7 @@ mod tipper {
     use ink::{
         codegen::EmitEvent,
         prelude::{string::String, vec::Vec},
-        storage::Mapping, env::{call::{build_call, ExecutionInput, FromAccountId, Selector}, DefaultEnvironment, }, LangError, primitives::AccountId  
+        storage::Mapping, env::{call::{build_call, ExecutionInput, FromAccountId, Selector}, DefaultEnvironment, }, LangError,   
     };
     use ink::{
         reflect::ContractEventBase,
@@ -230,11 +230,12 @@ mod tipper {
 
         }
         
-        fn delete_highlight(&self, from: AccountId) -> Result<(), TipperError> {
-
+        fn delete_tip_highlight(&self, from: AccountId) -> Result<(), TipperError> {
+            
             if let Some(highlight_tip) = self.highlighted_pizzas {
-                <HighlightedPizzasRef as FromAccountId<super::tipper::Environment, >>::from_account_id(highlight_tip).(from)?
+                <HighlightedPizzasRef as FromAccountId<super::tipper::Environment, >>::from_account_id(highlight_tip).delete_tip_by_author(from);
             }
+            Ok(())
         }
 
         fn emit_event<EE>(emitter: EE, event: Event)

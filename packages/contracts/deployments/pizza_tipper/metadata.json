@@ -1,6 +1,6 @@
 {
   "source": {
-    "hash": "0xf6a888be38427f4aeaeee7fa213a1f558dca9919dd7713a6ff8ffdf7be5e5d48",
+    "hash": "0x66778c5e601215818703e49abf00a4487bcd89a541ec7c5681159c46a325d41c",
     "language": "ink! 4.3.0",
     "compiler": "rustc 1.73.0",
     "build_info": {
@@ -25,7 +25,7 @@
       {
         "args": [
           {
-            "label": "_version",
+            "label": "version",
             "type": {
               "displayName": [
                 "u8"
@@ -34,30 +34,12 @@
             }
           },
           {
-            "label": "_pizza_oracle_hash",
+            "label": "highlighted_pizzas_hash",
             "type": {
               "displayName": [
                 "Hash"
               ],
               "type": 7
-            }
-          },
-          {
-            "label": "_highlighted_pizzas_hash",
-            "type": {
-              "displayName": [
-                "Hash"
-              ],
-              "type": 7
-            }
-          },
-          {
-            "label": "total_supply",
-            "type": {
-              "displayName": [
-                "Balance"
-              ],
-              "type": 5
             }
           },
           {
@@ -123,7 +105,7 @@
         "displayName": [
           "ChainExtension"
         ],
-        "type": 17
+        "type": 18
       },
       "hash": {
         "displayName": [
@@ -136,7 +118,7 @@
         "displayName": [
           "Timestamp"
         ],
-        "type": 16
+        "type": 17
       }
     },
     "events": [
@@ -228,22 +210,6 @@
     },
     "messages": [
       {
-        "args": [],
-        "default": false,
-        "docs": [],
-        "label": "total_supply",
-        "mutates": false,
-        "payable": false,
-        "returnType": {
-          "displayName": [
-            "ink",
-            "MessageResult"
-          ],
-          "type": 11
-        },
-        "selector": "0xdb6375a8"
-      },
-      {
         "args": [
           {
             "label": "owner",
@@ -328,6 +294,22 @@
           "type": 13
         },
         "selector": "0xedd26b46"
+      },
+      {
+        "args": [],
+        "default": false,
+        "docs": [],
+        "label": "terminate_contract",
+        "mutates": true,
+        "payable": false,
+        "returnType": {
+          "displayName": [
+            "ink",
+            "MessageResult"
+          ],
+          "type": 8
+        },
+        "selector": "0x4b5de42b"
       }
     ]
   },
@@ -409,15 +391,6 @@
                 }
               },
               "name": "tip_map"
-            },
-            {
-              "layout": {
-                "leaf": {
-                  "key": "0x00000000",
-                  "ty": 5
-                }
-              },
-              "name": "total_supply"
             },
             {
               "layout": {
@@ -883,6 +856,16 @@
               {
                 "index": 3,
                 "name": "TipError"
+              },
+              {
+                "fields": [
+                  {
+                    "type": 16,
+                    "typeName": "HighlightedPizzasError"
+                  }
+                ],
+                "index": 4,
+                "name": "HighlightError"
               }
             ]
           }
@@ -890,7 +873,7 @@
         "path": [
           "pizza_tipper",
           "tipper",
-          "Error"
+          "TipperError"
         ]
       }
     },
@@ -898,12 +881,40 @@
       "id": 16,
       "type": {
         "def": {
+          "variant": {
+            "variants": [
+              {
+                "index": 0,
+                "name": "AlreadyHighlighted"
+              },
+              {
+                "index": 1,
+                "name": "HighlightNotFound"
+              },
+              {
+                "index": 2,
+                "name": "AccessDenied"
+              }
+            ]
+          }
+        },
+        "path": [
+          "highlighted_pizzas",
+          "highlighted_pizzas",
+          "HighlightedPizzasError"
+        ]
+      }
+    },
+    {
+      "id": 17,
+      "type": {
+        "def": {
           "primitive": "u64"
         }
       }
     },
     {
-      "id": 17,
+      "id": 18,
       "type": {
         "def": {
           "variant": {}

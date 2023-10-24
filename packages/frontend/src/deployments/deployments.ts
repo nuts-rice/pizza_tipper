@@ -13,8 +13,8 @@ export const getDeployments = async (): Promise<SubstrateDeployment[]> => {
       {
         contractId: ContractIds.Greeter,
         networkId: network,
-        abi: await import(`@inkathon/contracts/deployments/greeter/metadata.json`),
-        address: (await import(`@inkathon/contracts/deployments/greeter/${network}.ts`)).address,
+        abi: await import(`@tipper/contracts/deployments/greeter/metadata.json`),
+        address: (await import(`@tipper/contracts/deployments/greeter/${network}.ts`)).address,
       },
       {
         contractId: ContractIds.Greeter,

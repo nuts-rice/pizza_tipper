@@ -52,18 +52,19 @@ const useFetchTip = () => {
   return { tipMessage, tipTo, tipPizzas, fetchIsLoading }
 }
 
+// const createAccount: FC = () => {
+//   const { contract, address: contractAddress } = useRegisteredContract(ContractIds.Tipper)
+  
+// }
 export const TipperContractInteractions: FC = () => {
   const { api, activeAccount, activeSigner } = useInkathon()
   //FIX CONTRACT IDS
   const { contract, address: contractAddress } = useRegisteredContract(ContractIds.Tipper)
-  const [tipMessage, setTipMessage] = useState<string>()
-  const [tipTo, setTipTo] = useState<string>()
-  const [tipPizzas, setTipPizzas] = useState<string>()
-  const [fetchIsLoading, setFetchIsLoading] = useState<boolean>()
-  const [updateIsLoading, setUpdateIsLoading] = useState<boolean>()
+  const {tipMessage, fetchIsLoading} = useFetchTip();
+  const [updateIsLoading, setUpdateIsLoading] = useState<boolean>(false);
   const { register, reset, handleSubmit } = useForm<UpdateTipValues>()
   
-    const updateTip = async ({newTipMessage, newTipTo, newTipPizzas}:
+    const UpdateTip = async ({newTipMessage, newTipTo, newTipPizzas}:
     UpdateTipValues) => {
         if (!activeAccount || !contract || !activeSigner || !api) {
       toast.error('Wallet not connected. Try again…')
@@ -80,7 +81,6 @@ export const TipperContractInteractions: FC = () => {
 
     } finally {
       setUpdateIsLoading(false)
-      useFetchTip()
     }
   }
   if (!api) return null
@@ -99,7 +99,7 @@ export const TipperContractInteractions: FC = () => {
     </FormControl>
     </Card>
     <Card variant="outline" p={4} bgColor="whiteAlpha.100">
-    <form onSubmit={handleSubmit(updateTip)}>
+    <form onSubmit={handleSubmit(UpdateTip)}>
     <Stack direction="row" spacing={2} align="end">
     <FormControl>
     <FormLabel> Update tip message</FormLabel>

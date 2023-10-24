@@ -22,13 +22,13 @@ const FeedPage : NextPage = () => {
   <>
     {}
     <FeedTopBar /> 
-    <CenterBody tw = "mt-20 mb-10 px-5">
+    <CenterBody tw = "mb-10 px-5">
     {}
     <FeedPageTitle/>
             {/* Connect Wallet Button */}
         <ConnectButton />
 
-        <div tw="mt-10 flex w-full flex-wrap items-start justify-center gap-4">
+        <div tw="flex w-full flex-wrap items-start justify-center gap-4">
           {/* Chain Metadata Information */}
           <ChainInfo />
 

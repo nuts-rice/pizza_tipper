@@ -1,7 +1,6 @@
 import Image from 'next/image'
 import Link from 'next/link'
-import  ProfilePageTitle  from '@components/profile/ProfilePageTitle'
-import { FeedTopBar } from '@components/feed/FeedTopBar'
+import  {ProfilePageTitle}  from '@components/profile/ProfilePageTitle'
 import { CenterBody } from '@components/layout/CenterBody'
 import { TipperContractInteractions } from '@components/web3/TipperContractInteractions'
 import { ChainInfo } from '@components/web3/ChainInfo'
@@ -14,10 +13,7 @@ import { toast } from 'react-hot-toast'
 import 'twin.macro'
 import tw, { styled } from 'twin.macro'
 
-const StyledIconLink = styled(Link)(() => [
-  tw`opacity-90 transition-all hover:(-translate-y-0.5 opacity-100)`,
-])
-
+const StyledIcon = tw.div`opacity-90 transition-all hover:(-translate-y-0.5 opacity-100)`;
 
 const ProfilePage: NextPage = () => {
 const { error } = useInkathon()
@@ -41,3 +37,5 @@ return (
 )
 
 }
+
+export default ProfilePage

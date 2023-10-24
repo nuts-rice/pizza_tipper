@@ -1,5 +1,5 @@
 {
-  "name": "@inkathon/frontend",
+  "name": "@tipper/frontend",
   "version": "0.0.1",
   "homepage": "https://inkathon.xyz",
   "babelMacros": {
@@ -26,7 +26,6 @@
     "@emotion/react": "^11.11.1",
     "@emotion/server": "^11.11.0",
     "@emotion/styled": "^11.11.0",
-    "@inkathon/contracts": "workspace:*",
     "@polkadot/api": "^10.9.1",
     "@polkadot/api-contract": "^10.9.1",
     "@polkadot/extension-dapp": "^0.46.5",
@@ -36,6 +35,11 @@
     "@polkadot/util": "^12.5.1",
     "@polkadot/util-crypto": "^12.5.1",
     "@scio-labs/use-inkathon": "^0.0.8",
+    "@tipper/contracts": "workspace:*",
+    "degen": "^0.0.159",
+    "ethers": "^6.8.0",
+    "graphql": "^16.8.1",
+    "graphql-request": "^6.1.0",
     "next": "^13.4.19",
     "next-seo": "^6.1.0",
     "react": "^18.2.0",
@@ -43,8 +47,11 @@
     "react-hook-form": "^7.46.1",
     "react-hot-toast": "^2.4.1",
     "react-icons": "^4.11.0",
+    "react-redux": "^8.1.3",
+    "satori": "0.10.9",
     "sharp": "^0.32.5",
     "spinners-react": "^1.0.7",
+    "test": "^3.3.0",
     "use-async-effect": "^2.2.7"
   },
   "devDependencies": {
@@ -62,6 +69,8 @@
     "babel-loader": "^9.1.3",
     "babel-plugin-macros": "^3.1.0",
     "concurrently": "^8.2.1",
+    "emojibase": "^6.1.0",
+    "emojibase-data": "^7.0.1",
     "eslint": "^8.49.0",
     "eslint-config-next": "^13.4.19",
     "eslint-config-prettier": "^9.0.0",
@@ -69,6 +78,7 @@
     "prettier": "^3.0.3",
     "prettier-plugin-twin.macro": "^1.0.14",
     "tailwindcss": "^3.3.3",
+    "twemoji": "^14.0.2",
     "twin.macro": "^3.4.0",
     "typescript": "^5.2.2",
     "webpack": "^5.88.2"
