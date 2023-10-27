@@ -22,7 +22,7 @@ https://github.com/azero-id/contract-integration/tree/main
 https://use.ink/
 
 ## Tests
-./Screenshot from 2023-10-27 15-36-15.png
+![Screenshot from 2023-10-27 15-36-15](https://github.com/nuts-rice/pizza_tipper/assets/5147364/7d2d1267-9253-448e-8f89-ca6ac0f54c13)
 
 Tests for emitting test on tip, constructor, checks for tip has the right value transferred
 Also has e2e tests for getting list of tippers from client
