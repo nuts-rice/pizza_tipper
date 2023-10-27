@@ -15,10 +15,15 @@ azero id or to tip  another user's azero id, respectively
 
 ## References
 Used the following to help me build smart contracts in ink:
+
 https://github.com/scio-labs/inkathon
+
 https://github.com/Cardinal-Cryptography/bulletin-board-example
+
 https://github.com/paritytech/ink-examples/tree/main
+
 https://github.com/azero-id/contract-integration/tree/main
+
 https://use.ink/
 
 ## Tests
