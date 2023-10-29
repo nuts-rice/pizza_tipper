@@ -3,4 +3,5 @@ workspace.resolver = "2"
 members = [    
     "pizza_tipper",
     "highlighted_pizzas",
+    "pizza_oracle"
 ]

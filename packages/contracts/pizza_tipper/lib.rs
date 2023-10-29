@@ -71,7 +71,6 @@ mod tipper {
             _highlighted_pizzas_hash: Hash,
             price_per_pizza: u128,
         ) -> Self {
-            let balances = Mapping::default();
             let _caller = Self::env().caller();
             //TODO: cross contract refs
             //let pizza_oracle_ref = PizzaOracleRef::new();
