@@ -30,102 +30,65 @@ const Tip: FC<TipProps> = ({tokenRate, onTip}: any)  => {
     toast.error(error.message)
   }, [error])
   const {api, activeAccount, activeSigner} =  useInkathon()
+  const [chainId, setChainId] = useState<SupportedChainId>(SupportedChainId.AlephZeroTestnet)
   const {contract, address: contractAddress} = useRegisteredContract(ContractIds.Tipper)
   const [tipState, setTipState] = useState<TIP_STATES>(TIP_STATES.ENTER_DETAILS)
   const [to, setTo] = useState<string>('')
   const [message, setMessage] = useState<string>('') ;
   const [pizzaCount, setPizzaCount] = useState<number>(1)
   const [tipId, setTipId] = useState<number>()
+  const [customRouterAddress, setCustomRouterAddress] = useState<string>()
+  const [lookupDomain, setLookupDomain] = useState<string>('domains.tzero')
+  const [lookupAddress, setLookupAddress] = useState<string>(    '5EFJEY4DG2FnzcuCZpnRjjzT4x7heeEXuoYy1yAoUmshEhAP', )
     // const alreadyExists = await useRegisteredContract(tipContract, tipId)
-    const tipAmount =  useMemo(() => pizzaCount * tokenRate, [pizzaCount, tokenRate]);
-    const handleTip = () => {
-     onTip?.(to, tipAmount)
-     }    
-    setTipState(TIP_STATES.CONFIRMED)
-     
-  return(
-  <></>
-  )
-  }
-const EnterDataStates: FC<{
-to: string
-setTo: Dispatch<SetStateAction<string>>
-message: string,
-setMessage: Dispatch<SetStateAction<string>>
-numberPizzas: number
-setNumberPizzas: Dispatch<SetStateAction<number>>
-submitTip: () => void 
-}> = ({
-to, 
-setTo,
-message,
-setMessage,
-numberPizzas,
-setNumberPizzas
-}) => {
-  const { error } = useInkathon()
   useEffect(() => {
-    if (!error) return
-    toast.error(error.message)
-  }, [error])
-  //todo: should be event
-  const validateAndSubmit = ()  => {
-    // event.preventDefault()
-// }
-} 
-return (
-<form onSubmit= {validateAndSubmit}>
-<FieldSet legend="">
-<Input
-label="Recipent Adress or AZERO.ID"/>
-<Input
-label="Tip message"/>
-</FieldSet>
+    if (!error) return;
+    toast.error(error.message);
+  }, [error]);
 
-</form>
-)
-}
-  // return (
-  // <div>
-  //     <label>
-  //       To:
-  //       <input 
-  //         type="text" 
-  //         placeholder="Recipient address or AZERO.ID" 
-  //         value={to} 
-  //         onChange={(e) => setTo(e.target.value)}
-  //       />
-  //     </label>
+  const tipAmount = useMemo(() => pizzaCount * (tokenRate || 0), [pizzaCount, tokenRate]);
 
-  //     <label>
-  //       Message:
-  //       <textarea 
-  //         placeholder="Your message here..."
-  //         value={message}
-  //         onChange={(e) => setMessage(e.target.value)}
-  //       />
-  //     </label>
+  const domainResolver = useResolveDomainToAddress(lookupDomain, {
+    debug: true,
+    chainId,
+    // Add additional properties as necessary
+  });
 
-  //     <div>
-  //       Pizza is {tokenRate} tokens
-  //     </div>
-
-  //     <label>
-  //       How many pizzas
-  //       <input 
-  //         type="number" 
-  //         min="1"
-  //         value={pizzaCount}
-  //         onChange={(e) => setPizzaCount(Number(e.target.value))}
-  //       />
-  //     </label>
-
-  //     <button onClick={() => handleTip}>
-  //       Send Tip
-  //     </button>
-  //   </div>
-  // );
-
-// }
+  const handleTip = () => {
+if (domainResolver.address && tipAmount) {
+    onTip(domainResolver.address || '', tipAmount);
+  }
+    setTipState(TIP_STATES.CONFIRMED);
+};
+  return (
+    <main>
+      <form onSubmit={(e) => {
+        e.preventDefault();
+        handleTip();
+      }}>
+        <fieldset>
+          <legend>Your Tip</legend>
+          <Input
+            label="Recipient Address or AZERO.ID"
+            value={lookupDomain}
+            onChange={(e) => setLookupDomain(e.target.value)}
+          />
+          {/* Display the result of domainResolver here */}
+          <Input
+            label="Tip Message"
+            value={message}
+            onChange={(e) => setMessage(e.target.value)}
+            // Add necessary props to Input
+          />
+          <Input
+            label="Number of pizzas"  
+            min="1"
+            value={pizzaCount}
+            onChange={(e) => setPizzaCount(Number(e.target.value))}
+            />
+            </fieldset>
+            </form>
+</main>
+)}
 export default Tip;
  

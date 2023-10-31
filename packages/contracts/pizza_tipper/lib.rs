@@ -40,7 +40,6 @@ mod tipper {
         id_counter: u32,
         id_map: Mapping<AccountId, u32>,
         tip_map: Mapping<u32, Tip>,
-        balances: Mapping<AccountId, Balance>,
         elements_count: u32,
         pizza_tippers: Vec<AccountId>,
         //oracle -> pizza cost goodness
@@ -84,7 +83,6 @@ mod tipper {
                 pizza_oracle: None,
                 highlighted_pizzas: None,
                 pizza_tippers: Vec::new(),
-                balances,
             }
         }
 
@@ -93,7 +91,6 @@ mod tipper {
             Self {
                 id_counter: 0,
                 price_per_pizza: 0,
-                balances: Mapping::default(),
                 elements_count: 0,
                 tip_map: Mapping::default(),
                 id_map: Mapping::default(),
@@ -103,10 +100,6 @@ mod tipper {
             }
         }
 
-        #[ink(message)]
-        pub fn balance_of(&self, owner: AccountId) -> Balance {
-            self.balances.get(owner).unwrap_or_default()
-        }
 
         #[ink(message)]
         pub fn get_pizza_tippers(&self) -> Vec<AccountId> {
